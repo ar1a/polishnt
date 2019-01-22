@@ -36,7 +36,7 @@ doOperation stack input
     run stack
   | otherwise = do
     let (result, stack') = perform stack input
-    let stack'' = push result stack'
+    let stack'' = result:stack'
     -- move up 1 line for the enter you just pressed and 2 lines for the 2
     -- numbers we're popping
     cursorUpLine 3
@@ -50,7 +50,7 @@ addNumber stack Nothing = do
   clearLine
   run stack
 addNumber stack (Just input) = do
-  let stack' = push input stack
+  let stack' = input:stack
   cursorUpLine 1
   clearLine
   print input
@@ -88,13 +88,9 @@ xy stack
     run stack
   | otherwise = do
       let x:y:stack' = stack
-      let stack'' = push x stack'
-      let stack''' = push y stack''
+      let stack'' = y:x:stack'
       cursorUpLine 3
       clearFromCursorToScreenEnd
       print x
       print y
-      run stack'''
------------------------------------
-push :: a -> [a] -> [a]
-push x xs = x:xs
+      run stack''
