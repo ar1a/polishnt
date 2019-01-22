@@ -21,6 +21,7 @@ run stack = do
       addHistory input
       case input of
         "discard" -> discard stack
+        "sqrt" -> sqrt' stack
         "xy" -> xy stack
         c | c `elem` ["+","-","*","/","^"] ->
               doOperation stack input
@@ -82,6 +83,19 @@ discard stack = do
   clearFromCursorToScreenEnd
   hFlush stdout
   run stack'
+
+sqrt' :: [Rational] -> IO ()
+sqrt' [] = do
+  cursorUpLine 1
+  clearLine
+  run []
+sqrt' (x:xs) = do
+  let n = fromRational x :: Double
+  let result = toRational $ sqrt n
+  cursorUpLine 2
+  clearFromCursorToScreenEnd
+  putStrLn $ printRational result
+  run $ result:xs
 
 xy :: [Rational] -> IO ()
 xy [] = do
