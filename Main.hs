@@ -22,8 +22,10 @@ run stack = do
       case input of
         "discard" -> discard stack
         "sqrt" -> sqrt' stack
+        "e" -> const' stack $ exp 1
+        "pi" -> const' stack pi
         "xy" -> xy stack
-        c | c `elem` ["+","-","*","/","^"] ->
+        c | c `elem` ["+","-","*","/","^","log"] ->
               doOperation stack input
         _ -> addNumber stack $ readMaybe input
 
@@ -62,6 +64,13 @@ perform (y:x:s) op =
     "-" -> (x - y,s)
     "*" -> (x * y,s)
     "/" -> (x / y,s)
+    "log" ->
+      let
+        x' = realToFrac x :: Double
+        y' = realToFrac y :: Double
+        result = logBase y' x'
+      in
+        (toRational result,s)
     "^" ->
       let
         x' = realToFrac x :: Double
@@ -110,6 +119,14 @@ xy stack = do
   putStrLn $ printRational x
   putStrLn $ printRational y
   run stack''
+
+const' :: [Rational] -> Double -> IO ()
+const' xs x = do
+  cursorUpLine 1
+  clearLine
+  let x' = toRational x
+  putStrLn $ printRational x'
+  run $ x':xs
 
 
 printRational :: Rational -> String
