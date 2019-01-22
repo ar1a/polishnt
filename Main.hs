@@ -30,6 +30,8 @@ run stack = do
             doOperation stack input
           | c == "discard" ->
           discard stack
+          | c == "xy" ->
+          xy stack
           | otherwise -> addNumber stack $ readMaybe c
 
 doOperation :: [Double] -> String -> IO ()
@@ -93,8 +95,27 @@ discard stack
     clearFromCursorToScreenEnd
     hFlush stdout
     run stack'
-xy = undefined
 
+xy :: [Double] -> IO ()
+xy stack
+  | stack == [] = do
+    cursorUpLine 1
+    clearLine
+    run stack
+  | otherwise = do
+      let ret = pop stack
+      let x = fst ret
+      let stack' = snd ret
+      let ret' = pop stack'
+      let y = fst ret'
+      let stack'' = snd ret'
+      let stack''' = push x stack''
+      let stack'''' = push y stack'''
+      cursorUpLine 3
+      clearFromCursorToScreenEnd
+      putStrLn $ show x
+      putStrLn $ show y
+      run stack''''
 -----------------------------------
 push :: a -> [a] -> [a]
 push x xs = x:xs
