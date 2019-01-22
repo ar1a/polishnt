@@ -19,14 +19,11 @@ run stack = do
     Just input -> do
       addHistory input
       case input of
-        c
-          | c `elem` ["+","-","*","/","^"] ->
-            doOperation stack input
-          | c == "discard" ->
-          discard stack
-          | c == "xy" ->
-          xy stack
-          | otherwise -> addNumber stack $ readMaybe c
+        "discard" -> discard stack
+        "xy" -> xy stack
+        c | c `elem` ["+","-","*","/","^"] ->
+              doOperation stack input
+        _ -> addNumber stack $ readMaybe input
 
 doOperation :: [Double] -> String -> IO ()
 doOperation stack@(_:_:_) input = do
