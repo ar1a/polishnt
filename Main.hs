@@ -36,9 +36,7 @@ doOperation stack input
     clearLine
     run stack
   | otherwise = do
-    let output = perform stack input
-    let result = fst output
-    let stack' = snd output
+    let (result, stack') = perform stack input
     let stack'' = push result stack'
     -- move up 1 line for the enter you just pressed and 2 lines for the 2
     -- numbers we're popping
@@ -62,12 +60,8 @@ addNumber stack (Just input) = do
 perform :: [Double] -> String -> (Double, [Double])
 perform stack op =
   let
-    y' = pop stack
-    y = fst y'
-    stack' = snd y'
-    x' = pop stack'
-    x = fst x'
-    s = snd x'
+    (y, stack') = pop stack
+    (x, s) = pop stack'
   in
     case op of
       "+" -> (x + y,s)
@@ -84,8 +78,7 @@ discard stack
     clearLine
     run stack
   | otherwise = do
-    let ret = pop stack
-    let stack' = snd ret
+    let (_, stack') = pop stack
     cursorUpLine 2
     clearFromCursorToScreenEnd
     hFlush stdout
@@ -98,12 +91,8 @@ xy stack
     clearLine
     run stack
   | otherwise = do
-      let ret = pop stack
-      let x = fst ret
-      let stack' = snd ret
-      let ret' = pop stack'
-      let y = fst ret'
-      let stack'' = snd ret'
+      let (x, stack') = pop stack
+      let (y, stack'') = pop stack'
       let stack''' = push x stack''
       let stack'''' = push y stack'''
       cursorUpLine 3
