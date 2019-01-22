@@ -24,10 +24,13 @@ run stack = do
     Just "quit" -> pure ()
     Just input -> do
       addHistory input
-      if (input `elem` ["+","-","*","/","^"]) then
-        doOperation stack input
-        else 
-        addNumber stack $ readMaybe input
+      case input of
+        c
+          | c `elem` ["+","-","*","/","^"] ->
+            doOperation stack input
+          | c == "discard" ->
+          discard stack
+          | otherwise -> addNumber stack $ readMaybe c
 
 doOperation :: [Double] -> String -> IO ()
 doOperation stack input
@@ -77,6 +80,20 @@ perform stack op =
       "^" -> (x ** y,s)
       _ -> error "you should never see this"
 
+discard :: [Double] -> IO ()
+discard stack
+  | stack == [] = do
+    cursorUpLine 1
+    clearLine
+    run stack
+  | otherwise = do
+    let ret = pop stack
+    let stack' = snd ret
+    cursorUpLine 2
+    clearFromCursorToScreenEnd
+    hFlush stdout
+    run stack'
+xy = undefined
 
 -----------------------------------
 push :: a -> [a] -> [a]
