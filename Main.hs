@@ -25,7 +25,7 @@ run stack = do
         "e" -> const' stack $ exp 1
         "pi" -> const' stack pi
         "xy" -> xy stack
-        c | c `elem` ["+","-","*","/","^"] ->
+        c | c `elem` ["+","-","*","/","^","log"] ->
               doOperation stack input
         _ -> addNumber stack $ readMaybe input
 
@@ -64,6 +64,13 @@ perform (y:x:s) op =
     "-" -> (x - y,s)
     "*" -> (x * y,s)
     "/" -> (x / y,s)
+    "log" ->
+      let
+        x' = realToFrac x :: Double
+        y' = realToFrac y :: Double
+        result = logBase y' x'
+      in
+        (toRational result,s)
     "^" ->
       let
         x' = realToFrac x :: Double
