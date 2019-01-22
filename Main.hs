@@ -10,11 +10,6 @@ main :: IO ()
 main = do
   run []
 
-pause :: IO ()
-pause = do
-  hFlush stdout
-  threadDelay 1000000
-
 run :: [Double] -> IO ()
 run stack = do
   maybeLine <- readline "% "
