@@ -1,10 +1,10 @@
 module Main where
 
+import Control.Concurrent
 import System.Console.ANSI
 import System.Console.Readline
-import Text.Read
-import Control.Concurrent
 import System.IO
+import Text.Read
 
 main :: IO ()
 main = do
