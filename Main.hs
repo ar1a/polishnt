@@ -41,7 +41,7 @@ doOperation stack input
     -- numbers we're popping
     cursorUpLine 3
     clearFromCursorToScreenEnd
-    putStrLn $ show result
+    print result
     run stack''
 
 addNumber :: [Double] -> Maybe Double -> IO ()
@@ -53,7 +53,7 @@ addNumber stack (Just input) = do
   let stack' = push input stack
   cursorUpLine 1
   clearLine
-  putStrLn $ show input
+  print input
   run stack'
 
 perform :: [Double] -> String -> (Double, [Double])
