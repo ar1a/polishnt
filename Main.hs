@@ -29,20 +29,19 @@ run stack = do
           | otherwise -> addNumber stack $ readMaybe c
 
 doOperation :: [Double] -> String -> IO ()
-doOperation stack input
-  | length stack < 2 = do
-    cursorUpLine 1
-    clearLine
-    run stack
-  | otherwise = do
-    let (result, stack') = perform stack input
-    let stack'' = result:stack'
-    -- move up 1 line for the enter you just pressed and 2 lines for the 2
-    -- numbers we're popping
-    cursorUpLine 3
-    clearFromCursorToScreenEnd
-    print result
-    run stack''
+doOperation stack@(_:_:_) input = do
+  let (result, stack') = perform stack input
+  let stack'' = result:stack'
+  -- move up 1 line for the enter you just pressed and 2 lines for the 2
+  -- numbers we're popping
+  cursorUpLine 3
+  clearFromCursorToScreenEnd
+  print result
+  run stack''
+doOperation stack _ = do
+  cursorUpLine 1
+  clearLine
+  run stack
 
 addNumber :: [Double] -> Maybe Double -> IO ()
 addNumber stack Nothing = do
@@ -68,29 +67,27 @@ perform (y:x:s) op =
 perform _ _ = error "you should never see this 2"
 
 discard :: [Double] -> IO ()
-discard stack
-  | stack == [] = do
-    cursorUpLine 1
-    clearLine
-    run stack
-  | otherwise = do
-    let _:stack' = stack
-    cursorUpLine 2
-    clearFromCursorToScreenEnd
-    hFlush stdout
-    run stack'
+discard [] = do
+  cursorUpLine 1
+  clearLine
+  run []
+discard stack = do
+  let _:stack' = stack
+  cursorUpLine 2
+  clearFromCursorToScreenEnd
+  hFlush stdout
+  run stack'
 
 xy :: [Double] -> IO ()
-xy stack
-  | stack == [] = do
-    cursorUpLine 1
-    clearLine
-    run stack
-  | otherwise = do
-      let x:y:stack' = stack
-      let stack'' = y:x:stack'
-      cursorUpLine 3
-      clearFromCursorToScreenEnd
-      print x
-      print y
-      run stack''
+xy [] = do
+  cursorUpLine 1
+  clearLine
+  run []
+xy stack = do
+  let x:y:stack' = stack
+  let stack'' = y:x:stack'
+  cursorUpLine 3
+  clearFromCursorToScreenEnd
+  print x
+  print y
+  run stack''
