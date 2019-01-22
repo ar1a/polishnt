@@ -1,6 +1,7 @@
 module Main where
 
 import System.Console.ANSI
+import Data.Number.CReal
 import System.Console.Readline
 import System.IO
 import Text.Read
@@ -9,7 +10,7 @@ main :: IO ()
 main = do
   run []
 
-run :: [Double] -> IO ()
+run :: [Rational] -> IO ()
 run stack = do
   maybeLine <- readline "% "
   case maybeLine of
@@ -25,7 +26,7 @@ run stack = do
               doOperation stack input
         _ -> addNumber stack $ readMaybe input
 
-doOperation :: [Double] -> String -> IO ()
+doOperation :: [Rational] -> String -> IO ()
 doOperation stack@(_:_:_) input = do
   let (result, stack') = perform stack input
   let stack'' = result:stack'
@@ -33,37 +34,44 @@ doOperation stack@(_:_:_) input = do
   -- numbers we're popping
   cursorUpLine 3
   clearFromCursorToScreenEnd
-  print result
+  putStrLn $ printRational result
   run stack''
 doOperation stack _ = do
   cursorUpLine 1
   clearLine
   run stack
 
-addNumber :: [Double] -> Maybe Double -> IO ()
+addNumber :: [Rational] -> Maybe Double -> IO ()
 addNumber stack Nothing = do
   cursorUpLine 1
   clearLine
   run stack
 addNumber stack (Just input) = do
-  let stack' = input:stack
+  let input' = toRational input
+  let stack' = input':stack
   cursorUpLine 1
   clearLine
   print input
   run stack'
 
-perform :: [Double] -> String -> (Double, [Double])
+perform :: [Rational] -> [Char] -> (Rational, [Rational])
 perform (y:x:s) op =
   case op of
     "+" -> (x + y,s)
     "-" -> (x - y,s)
     "*" -> (x * y,s)
     "/" -> (x / y,s)
-    "^" -> (x ** y,s)
+    "^" ->
+      let
+        x' = realToFrac x :: Double
+        y' = realToFrac y :: Double
+        result = x' ** y'
+      in
+        (toRational result,s)
     _ -> error "you should never see this"
 perform _ _ = error "you should never see this 2"
 
-discard :: [Double] -> IO ()
+discard :: [Rational] -> IO ()
 discard [] = do
   cursorUpLine 1
   clearLine
@@ -75,7 +83,7 @@ discard stack = do
   hFlush stdout
   run stack'
 
-xy :: [Double] -> IO ()
+xy :: [Rational] -> IO ()
 xy [] = do
   cursorUpLine 1
   clearLine
@@ -85,6 +93,10 @@ xy stack = do
   let stack'' = y:x:stack'
   cursorUpLine 3
   clearFromCursorToScreenEnd
-  print x
-  print y
+  putStrLn $ printRational x
+  putStrLn $ printRational y
   run stack''
+
+
+printRational :: Rational -> String
+printRational rat = showCReal 13 $ fromRational rat

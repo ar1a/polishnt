@@ -22,5 +22,6 @@ executable polishnt
   build-depends:       base ^>=4.12.0.0
                        ,ansi-terminal ^>=0.8.2
                        ,readline ^>=1.0.3.0
+                       ,numbers ^>=3000.2.0.2
   -- hs-source-dirs:
   default-language:    Haskell2010
