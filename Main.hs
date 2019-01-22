@@ -22,6 +22,8 @@ run stack = do
       case input of
         "discard" -> discard stack
         "sqrt" -> sqrt' stack
+        "e" -> const' stack $ exp 1
+        "pi" -> const' stack pi
         "xy" -> xy stack
         c | c `elem` ["+","-","*","/","^"] ->
               doOperation stack input
@@ -110,6 +112,14 @@ xy stack = do
   putStrLn $ printRational x
   putStrLn $ printRational y
   run stack''
+
+const' :: [Rational] -> Double -> IO ()
+const' xs x = do
+  cursorUpLine 1
+  clearLine
+  let x' = toRational x
+  putStrLn $ printRational x'
+  run $ x':xs
 
 
 printRational :: Rational -> String
