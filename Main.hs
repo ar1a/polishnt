@@ -1,6 +1,5 @@
 module Main where
 
-import Control.Concurrent
 import System.Console.ANSI
 import System.Console.Readline
 import System.IO
@@ -58,18 +57,15 @@ addNumber stack (Just input) = do
   run stack'
 
 perform :: [Double] -> String -> (Double, [Double])
-perform stack op =
-  let
-    (y, stack') = pop stack
-    (x, s) = pop stack'
-  in
-    case op of
-      "+" -> (x + y,s)
-      "-" -> (x - y,s)
-      "*" -> (x * y,s)
-      "/" -> (x / y,s)
-      "^" -> (x ** y,s)
-      _ -> error "you should never see this"
+perform (y:x:s) op =
+  case op of
+    "+" -> (x + y,s)
+    "-" -> (x - y,s)
+    "*" -> (x * y,s)
+    "/" -> (x / y,s)
+    "^" -> (x ** y,s)
+    _ -> error "you should never see this"
+perform _ _ = error "you should never see this 2"
 
 discard :: [Double] -> IO ()
 discard stack
@@ -78,7 +74,7 @@ discard stack
     clearLine
     run stack
   | otherwise = do
-    let (_, stack') = pop stack
+    let _:stack' = stack
     cursorUpLine 2
     clearFromCursorToScreenEnd
     hFlush stdout
@@ -91,19 +87,14 @@ xy stack
     clearLine
     run stack
   | otherwise = do
-      let (x, stack') = pop stack
-      let (y, stack'') = pop stack'
-      let stack''' = push x stack''
-      let stack'''' = push y stack'''
+      let x:y:stack' = stack
+      let stack'' = push x stack'
+      let stack''' = push y stack''
       cursorUpLine 3
       clearFromCursorToScreenEnd
-      putStrLn $ show x
-      putStrLn $ show y
-      run stack''''
+      print x
+      print y
+      run stack'''
 -----------------------------------
 push :: a -> [a] -> [a]
 push x xs = x:xs
-
-pop :: [a] -> (a, [a])
-pop [] = error "stack empty"
-pop (x:xs) = (x, xs)
