@@ -1,8 +1,10 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Polishnt where
 
 import System.Console.ANSI
 import Data.Number.CReal
 import System.Console.Readline
+import qualified Data.Text as T
 import System.IO
 import Text.Read
 
@@ -25,14 +27,15 @@ run stack = do
         "pi" -> const' stack pi
         c | c `elem` ["xy","swap"] -> xy stack
         c | c `elem` ["+","-","*","/","^","log"] ->
-              doOperation stack input
-        _ -> addNumber stack $ readInput input
+              doOperation stack $ T.pack input
+        _ -> addNumber stack $ readInput $ T.pack input
 
-readInput :: String -> Maybe Double
-readInput i@('.':_) = readInput ('0':i)
-readInput s = readMaybe s
+readInput :: T.Text -> Maybe Double
+readInput s
+  | "." `T.isPrefixOf` s = readInput $ '0' `T.cons` s
+  | otherwise = readMaybe $ T.unpack s
   
-doOperation :: Stack -> String -> IO ()
+doOperation :: Stack -> T.Text -> IO ()
 doOperation stack@(_:_:_) input = do
   let stack' = perform stack input
   -- move up 1 line for the enter you just pressed and 2 lines for the 2
@@ -57,7 +60,7 @@ addNumber stack (Just input) = do
 addNumberStack :: Stack -> Double -> Stack
 addNumberStack stack n = toRational n:stack
 
-perform :: Stack -> String -> Stack
+perform :: Stack -> T.Text -> Stack
 perform (y:x:s) op =
   case op of
     "+" -> x + y:s

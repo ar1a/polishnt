@@ -1,7 +1,9 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Tests where
 
 import Test.QuickCheck
+import qualified Data.Text as T
 -- import Test.QuickCheck.Modifiers (NonEmptyList (..))
 import Polishnt
 
@@ -34,7 +36,7 @@ prop_sub :: Double -> Double -> Bool
 prop_sub = test_binary "-" (-)
 
 test_binary
-  :: String
+  :: T.Text
   -> (Rational -> Rational -> Rational)
   -> Double
   -> Double
