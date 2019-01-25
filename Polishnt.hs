@@ -26,8 +26,12 @@ run stack = do
         c | c `elem` ["xy","swap"] -> xy stack
         c | c `elem` ["+","-","*","/","^","log"] ->
               doOperation stack input
-        _ -> addNumber stack $ readMaybe input
+        _ -> addNumber stack $ readInput input
 
+readInput :: String -> Maybe Double
+readInput i@('.':_) = readInput ('0':i)
+readInput s = readMaybe s
+  
 doOperation :: Stack -> String -> IO ()
 doOperation stack@(_:_:_) input = do
   let stack' = perform stack input
