@@ -6,10 +6,12 @@ import System.Console.Readline
 import System.IO
 import Text.Read
 
+type Stack = [Rational]
+
 main :: IO ()
 main = run []
 
-run :: [Rational] -> IO ()
+run :: Stack -> IO ()
 run stack = do
   maybeLine <- readline "% "
   case maybeLine of
@@ -28,7 +30,7 @@ run stack = do
               doOperation stack input
         _ -> addNumber stack $ readMaybe input
 
-doOperation :: [Rational] -> String -> IO ()
+doOperation :: Stack -> String -> IO ()
 doOperation stack@(_:_:_) input = do
   let (result, stack') = perform stack input
   let stack'' = result:stack'
@@ -41,7 +43,7 @@ doOperation stack _ = do
   upAndClear 1
   run stack
 
-addNumber :: [Rational] -> Maybe Double -> IO ()
+addNumber :: Stack -> Maybe Double -> IO ()
 addNumber stack Nothing = do
   upAndClear 1
   run stack
@@ -52,7 +54,7 @@ addNumber stack (Just input) = do
   print input
   run stack'
 
-perform :: [Rational] -> String -> (Rational, [Rational])
+perform :: Stack -> String -> (Rational, Stack)
 perform (y:x:s) op =
   case op of
     "+" -> (x + y,s)
@@ -76,7 +78,7 @@ perform (y:x:s) op =
     _ -> error "you should never see this"
 perform _ _ = error "you should never see this 2"
 
-discard :: [Rational] -> IO ()
+discard :: Stack -> IO ()
 discard [] = do
   upAndClear 1
   run []
@@ -86,7 +88,7 @@ discard stack = do
   hFlush stdout
   run stack'
 
-sqrt' :: [Rational] -> IO ()
+sqrt' :: Stack -> IO ()
 sqrt' [] = do
   upAndClear 1
   run []
@@ -97,7 +99,7 @@ sqrt' (x:xs) = do
   putStrLn $ printRational result
   run $ result:xs
 
-xy :: [Rational] -> IO ()
+xy :: Stack -> IO ()
 xy [] = do
   upAndClear 1
   run []
@@ -109,7 +111,7 @@ xy stack = do
   putStrLn $ printRational y
   run stack''
 
-const' :: [Rational] -> Double -> IO ()
+const' :: Stack -> Double -> IO ()
 const' xs x = do
   upAndClear 1
   let x' = toRational x
