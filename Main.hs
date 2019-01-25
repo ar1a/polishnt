@@ -83,40 +83,58 @@ discard [] = do
   upAndClear 1
   run []
 discard stack = do
-  let _:stack' = stack
+  let stack' = discardElement stack
   upAndClear 2
   hFlush stdout
   run stack'
+
+discardElement :: Stack -> Stack
+discardElement [] = []
+discardElement (_:xs) = xs
 
 sqrt' :: Stack -> IO ()
 sqrt' [] = do
   upAndClear 1
   run []
-sqrt' (x:xs) = do
-  let n = fromRational x :: Double
-  let result = toRational $ sqrt n
+sqrt' xs = do
+  let stack = sqrtStack xs
   upAndClear 2
-  putStrLn $ printRational result
-  run $ result:xs
+  putStrLn $ printRational (head stack)
+  run stack
+
+sqrtStack :: Stack -> Stack
+sqrtStack [] = []
+sqrtStack (x:xs) =
+  toRational (sqrt (fromRational x :: Double)):xs
+  
 
 xy :: Stack -> IO ()
-xy [] = do
-  upAndClear 1
-  run []
-xy stack = do
-  let x:y:stack' = stack
-  let stack'' = y:x:stack'
+xy stack@(_:_:_) = do
+  let stack' = xyStack stack
   upAndClear 3
-  putStrLn $ printRational x
-  putStrLn $ printRational y
-  run stack''
+  putStrLn $ printRational (stack' !! 1)
+  putStrLn $ printRational (head stack')
+  run stack'
+xy xs = do
+  upAndClear 1
+  run xs
+
+xyStack :: Stack -> Stack
+xyStack (x:y:xs) = y:x:xs
+xyStack xs = xs
 
 const' :: Stack -> Double -> IO ()
 const' xs x = do
   upAndClear 1
-  let x' = toRational x
-  putStrLn $ printRational x'
-  run $ x':xs
+  let stack = constStack x xs
+  putStrLn $ printRational (head stack)
+  run stack
+
+constStack :: Double -> Stack -> Stack
+constStack x xs =
+  x':xs
+  where
+    x' = toRational x
 
 
 printRational :: Rational -> String
