@@ -7,8 +7,7 @@ import System.IO
 import Text.Read
 
 main :: IO ()
-main = do
-  run []
+main = run []
 
 run :: [Rational] -> IO ()
 run stack = do
@@ -24,7 +23,7 @@ run stack = do
         "sqrt" -> sqrt' stack
         "e" -> const' stack $ exp 1
         "pi" -> const' stack pi
-        "xy" -> xy stack
+        c | c `elem` ["xy","swap"] -> xy stack
         c | c `elem` ["+","-","*","/","^","log"] ->
               doOperation stack input
         _ -> addNumber stack $ readMaybe input
@@ -35,29 +34,25 @@ doOperation stack@(_:_:_) input = do
   let stack'' = result:stack'
   -- move up 1 line for the enter you just pressed and 2 lines for the 2
   -- numbers we're popping
-  cursorUpLine 3
-  clearFromCursorToScreenEnd
+  upAndClear 3
   putStrLn $ printRational result
   run stack''
 doOperation stack _ = do
-  cursorUpLine 1
-  clearLine
+  upAndClear 1
   run stack
 
 addNumber :: [Rational] -> Maybe Double -> IO ()
 addNumber stack Nothing = do
-  cursorUpLine 1
-  clearLine
+  upAndClear 1
   run stack
 addNumber stack (Just input) = do
   let input' = toRational input
   let stack' = input':stack
-  cursorUpLine 1
-  clearLine
+  upAndClear 1
   print input
   run stack'
 
-perform :: [Rational] -> [Char] -> (Rational, [Rational])
+perform :: [Rational] -> String -> (Rational, [Rational])
 perform (y:x:s) op =
   case op of
     "+" -> (x + y,s)
@@ -83,47 +78,40 @@ perform _ _ = error "you should never see this 2"
 
 discard :: [Rational] -> IO ()
 discard [] = do
-  cursorUpLine 1
-  clearLine
+  upAndClear 1
   run []
 discard stack = do
   let _:stack' = stack
-  cursorUpLine 2
-  clearFromCursorToScreenEnd
+  upAndClear 2
   hFlush stdout
   run stack'
 
 sqrt' :: [Rational] -> IO ()
 sqrt' [] = do
-  cursorUpLine 1
-  clearLine
+  upAndClear 1
   run []
 sqrt' (x:xs) = do
   let n = fromRational x :: Double
   let result = toRational $ sqrt n
-  cursorUpLine 2
-  clearFromCursorToScreenEnd
+  upAndClear 2
   putStrLn $ printRational result
   run $ result:xs
 
 xy :: [Rational] -> IO ()
 xy [] = do
-  cursorUpLine 1
-  clearLine
+  upAndClear 1
   run []
 xy stack = do
   let x:y:stack' = stack
   let stack'' = y:x:stack'
-  cursorUpLine 3
-  clearFromCursorToScreenEnd
+  upAndClear 3
   putStrLn $ printRational x
   putStrLn $ printRational y
   run stack''
 
 const' :: [Rational] -> Double -> IO ()
 const' xs x = do
-  cursorUpLine 1
-  clearLine
+  upAndClear 1
   let x' = toRational x
   putStrLn $ printRational x'
   run $ x':xs
@@ -131,3 +119,8 @@ const' xs x = do
 
 printRational :: Rational -> String
 printRational rat = showCReal 13 $ fromRational rat
+
+upAndClear :: Int -> IO ()
+upAndClear n = do
+  cursorUpLine n
+  clearFromCursorToScreenEnd
