@@ -30,13 +30,12 @@ run stack = do
 
 doOperation :: Stack -> String -> IO ()
 doOperation stack@(_:_:_) input = do
-  let (result, stack') = perform stack input
-  let stack'' = result:stack'
+  let stack' = perform stack input
   -- move up 1 line for the enter you just pressed and 2 lines for the 2
   -- numbers we're popping
   upAndClear 3
-  putStrLn $ printRational result
-  run stack''
+  putStrLn $ printRational (head stack')
+  run stack'
 doOperation stack _ = do
   upAndClear 1
   run stack
@@ -54,27 +53,27 @@ addNumber stack (Just input) = do
 addNumberStack :: Stack -> Double -> Stack
 addNumberStack stack n = toRational n:stack
 
-perform :: Stack -> String -> (Rational, Stack)
+perform :: Stack -> String -> Stack
 perform (y:x:s) op =
   case op of
-    "+" -> (x + y,s)
-    "-" -> (x - y,s)
-    "*" -> (x * y,s)
-    "/" -> (x / y,s)
+    "+" -> x + y:s
+    "-" -> x - y:s
+    "*" -> x * y:s
+    "/" -> x / y:s
     "log" ->
       let
         x' = realToFrac x :: Double
         y' = realToFrac y :: Double
         result = logBase y' x'
       in
-        (toRational result,s)
+        toRational result:s
     "^" ->
       let
         x' = realToFrac x :: Double
         y' = realToFrac y :: Double
         result = x' ** y'
       in
-        (toRational result,s)
+        toRational result:s
     _ -> error "you should never see this"
 perform _ _ = error "you should never see this 2"
 
