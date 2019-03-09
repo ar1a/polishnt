@@ -20,9 +20,9 @@ executable polishnt
   -- other-modules:
   -- other-extensions:
   build-depends:       base >=4.11.0.0
-                       ,ansi-terminal >=0.8.0.4
-                       ,readline ^>=1.0.3.0
-                       ,numbers ^>=3000.2.0.2
+                       ,ansi-terminal
+                       ,readline
+                       ,numbers
                        ,QuickCheck
                        ,text
   -- hs-source-dirs:
