@@ -3,7 +3,7 @@ cabal-version:       2.2
 --   For further documentation, see http://haskell.org/cabal/users-guide/
 
 name:                polishnt
-version:             0.1.0.0
+version:             0.2.0.0
 -- synopsis:
 -- description:
 -- bug-reports:
@@ -17,11 +17,11 @@ extra-source-files:  CHANGELOG.md
 
 executable polishnt
   main-is:             Main.hs
-  -- other-modules:
+  other-modules:       Polishnt
   -- other-extensions:
-  build-depends:       base >=4.11.0.0
+  build-depends:       base >=4.9.1.0
                        ,ansi-terminal
-                       ,readline
+                       ,haskeline
                        ,numbers
                        ,QuickCheck
                        ,text
